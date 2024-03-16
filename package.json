@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@nuxt/eslint-config": "^0.2.0",
+    "@nuxt/ui": "latest",
     "@rushstack/eslint-patch": "^1.7.2",
     "@types/bun": "^1.0.8",
     "@types/web-push": "^3.6.3",

@@ -79,18 +79,30 @@ const send = async () => {
 
 <template>
   <ClientOnly>
-    <div>
-      <div>Notifications access: {{ notificationAccess }}</div>
+    <UContainer class="flex flex-col gap-6 p-6">
+      <h1 class="text-2xl font-bold">Nuxt Push Notifications</h1>
 
-      <button @click="subscribe">Subscribe to Push Notifications</button>
+      <UCard :ui="{ body: { base: 'flex flex-col gap-3' } }">
+        <h2 class="text-xl font-semibold">Push Notifications</h2>
 
-      <form @submit.prevent="send">
-        <input v-model="message" />
-        <button type="submit">Send Push Notification</button>
-      </form>
+        <div>Notifications access: {{ notificationAccess }}</div>
 
-      <div v-if="error">{{ error }}</div>
-    </div>
+        <UButton class="self-start" @click="subscribe">
+          Subscribe to Push Notifications
+        </UButton>
+      </UCard>
+
+      <UCard :ui="{ body: { base: 'flex flex-col gap-3' } }">
+        <h2 class="text-xl font-semibold">Send Push Notification</h2>
+
+        <form class="flex gap-3" @submit.prevent="send">
+          <UInput v-model="message" class="grow" />
+          <UButton type="submit">Send Push Notification</UButton>
+        </form>
+
+        <UAlert v-if="error">{{ error }}</UAlert>
+      </UCard>
+    </UContainer>
   </ClientOnly>
 
   <NuxtPwaAssets />

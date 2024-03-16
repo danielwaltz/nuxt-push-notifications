@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@vite-pwa/nuxt', '@vueuse/nuxt'],
+  modules: ['@vite-pwa/nuxt', '@vueuse/nuxt', '@nuxt/ui'],
   nitro: {
     storage: {
       db: {
