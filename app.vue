@@ -11,7 +11,13 @@ const handleError = (message: string) => {
   console.error(message);
 };
 
+const resetError = () => {
+  error.value = '';
+};
+
 const subscribe = async () => {
+  resetError();
+
   if (!$pwa) {
     handleError('PWA module is not available');
     return;
@@ -61,6 +67,8 @@ const subscribe = async () => {
 };
 
 const send = async () => {
+  resetError();
+
   const result = await $fetch('/api/notifications/send', {
     method: 'POST',
     body: {
@@ -99,9 +107,9 @@ const send = async () => {
           <UInput v-model="message" class="grow" />
           <UButton type="submit">Send Push Notification</UButton>
         </form>
-
-        <UAlert v-if="error">{{ error }}</UAlert>
       </UCard>
+
+      <UAlert v-if="error" :title="error" color="red" />
     </UContainer>
   </ClientOnly>
 
