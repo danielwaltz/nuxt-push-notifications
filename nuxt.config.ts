@@ -5,7 +5,7 @@ export default defineNuxtConfig({
     storage: {
       db: {
         driver: 'fs',
-        base: './data/db',
+        base: './.data/db',
       },
     },
   },
