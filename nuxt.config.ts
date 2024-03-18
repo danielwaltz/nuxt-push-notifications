@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   nitro: {
     storage: {
       db: {
-        driver: 'fs',
+        driver: 'fsLite',
         base: './.data/db',
       },
     },
