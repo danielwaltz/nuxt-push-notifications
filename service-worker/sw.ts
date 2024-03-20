@@ -16,9 +16,7 @@ clientsClaim();
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 
-registerRoute(
-  new NavigationRoute(createHandlerBoundToURL('/'), { allowlist: [/^\/$/] }),
-);
+registerRoute(new NavigationRoute(createHandlerBoundToURL('/')));
 
 self.addEventListener('push', onPush);
 self.addEventListener('notificationclick', onNotificationClick);
