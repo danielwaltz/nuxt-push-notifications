@@ -1,6 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@vite-pwa/nuxt', '@vueuse/nuxt', '@nuxt/ui'],
+  modules: [
+    '@hebilicious/vue-query-nuxt',
+    '@nuxt/ui',
+    '@vite-pwa/nuxt',
+    '@vueuse/nuxt',
+  ],
   nitro: {
     storage: {
       db: {
@@ -18,9 +23,6 @@ export default defineNuxtConfig({
         vapidPublicKey: '',
       },
     },
-  },
-  devServer: {
-    host: '0.0.0.0',
   },
   pwa: {
     strategies: 'injectManifest',

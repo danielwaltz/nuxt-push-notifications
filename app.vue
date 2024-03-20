@@ -1,117 +1,144 @@
 <script setup lang="ts">
 const { $pwa } = useNuxtApp();
 const runtimeConfig = useRuntimeConfig();
+const toast = useToast();
 const notificationAccess = usePermission('notifications');
 
-const message = ref('Hello!');
-const error = ref('');
+const { isPending: isSubscribePending, mutateAsync: subscribeMutate } =
+  useMutation({
+    mutationKey: ['subscribe'],
+    mutationFn: async () => {
+      if (!$pwa) {
+        throw new Error('PWA module is not available');
+      }
 
-const handleError = (message: string) => {
-  error.value = message;
-  console.error(message);
-};
+      const isServiceWorkerAvailable = 'serviceWorker' in navigator;
+      const isPushManagerAvailable = 'PushManager' in window;
 
-const resetError = () => {
-  error.value = '';
-};
+      if (!isServiceWorkerAvailable || !isPushManagerAvailable) {
+        throw new Error('Service Worker or Push Manager is not available');
+      }
 
-const subscribe = async () => {
-  resetError();
+      const permission = await Notification.requestPermission();
 
-  if (!$pwa) {
-    handleError('PWA module is not available');
-    return;
-  }
+      const isGranted = permission === 'granted';
 
-  const isServiceWorkerAvailable = 'serviceWorker' in navigator;
-  const isPushManagerAvailable = 'PushManager' in window;
+      if (!isGranted) {
+        throw new Error('Permission not granted');
+      }
 
-  if (!isServiceWorkerAvailable || !isPushManagerAvailable) {
-    handleError('Service Worker or Push Manager is not available');
-    return;
-  }
+      const registration = $pwa.getSWRegistration();
 
-  const permission = await Notification.requestPermission();
+      if (!registration) {
+        throw new Error('Service Worker registration is not available');
+      }
 
-  const isGranted = permission === 'granted';
+      const vapidPublicKey = runtimeConfig.public.push.vapidPublicKey;
 
-  if (!isGranted) {
-    handleError('Permission not granted');
-    return;
-  }
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+      });
 
-  const registration = $pwa.getSWRegistration();
+      const result = await $fetch('/api/notifications/subscribe', {
+        method: 'POST',
+        body: subscription,
+      });
 
-  if (!registration) {
-    handleError('Service Worker registration is not available');
-    return;
-  }
+      if (!result.success) throw new Error('Subscription not saved');
 
-  const vapidPublicKey = runtimeConfig.public.push.vapidPublicKey;
-
-  const subscription = await registration.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-  });
-
-  const result = await $fetch('/api/notifications/subscribe', {
-    method: 'POST',
-    body: subscription,
-  });
-
-  if (result.success) {
-    console.log('Subscription saved');
-  } else {
-    handleError('Subscription not saved');
-  }
-};
-
-const send = async () => {
-  resetError();
-
-  const result = await $fetch('/api/notifications/send', {
-    method: 'POST',
-    body: {
-      title: message.value,
-      data: { url: 'http://localhost:3000' },
+      console.log('Subscription saved');
+    },
+    onSuccess: () => {
+      toast.add({ title: 'Subscribed to push notifications', color: 'green' });
+    },
+    onError: (error) => {
+      toast.add({ title: error.message, color: 'red' });
     },
   });
 
-  if (result.success) {
+const {
+  isPending: isSendNotificationPending,
+  mutateAsync: sendNotificationMutate,
+} = useMutation({
+  mutationKey: ['sendNotification'],
+  mutationFn: async (message: string) => {
+    if (!message) {
+      throw new Error('Message is required');
+    }
+
+    const result = await $fetch('/api/notifications/send', {
+      method: 'POST',
+      body: {
+        title: message,
+        data: { url: 'http://localhost:3000' },
+      },
+    });
+
+    if (!result.success) throw new Error('Notification not sent');
+
     console.log('Notification sent');
-  } else {
-    handleError('Notification not sent');
-  }
+  },
+  onSuccess: () => {
+    toast.add({ title: 'Notification sent', color: 'green' });
+  },
+  onError: (error) => {
+    toast.add({ title: error.message, color: 'red' });
+  },
+});
+
+const message = ref('');
+
+const sendNotification = async () => {
+  await sendNotificationMutate(message.value);
+
+  message.value = '';
 };
 </script>
 
 <template>
-  <ClientOnly>
-    <UContainer class="flex flex-col gap-6 p-6">
-      <h1 class="text-2xl font-bold">Nuxt Push Notifications</h1>
+  <UContainer class="flex flex-col gap-6 p-6">
+    <h1 class="text-2xl font-bold">Nuxt Push Notifications</h1>
 
-      <UCard :ui="{ body: { base: 'flex flex-col gap-3' } }">
-        <h2 class="text-xl font-semibold">Push Notifications</h2>
+    <UCard :ui="{ body: { base: 'flex flex-col gap-3' } }">
+      <h2 class="text-xl font-semibold">Push Notifications</h2>
 
+      <ClientOnly>
         <div>Notifications access: {{ notificationAccess }}</div>
+      </ClientOnly>
 
-        <UButton class="self-start" @click="subscribe">
-          Subscribe to Push Notifications
+      <UButton
+        :disabled="isSubscribePending"
+        :loading="isSubscribePending"
+        class="self-start"
+        @click="subscribeMutate"
+      >
+        Subscribe to Push Notifications
+      </UButton>
+    </UCard>
+
+    <UCard :ui="{ body: { base: 'flex flex-col gap-3' } }">
+      <h2 class="text-xl font-semibold">Send Push Notification</h2>
+
+      <form class="flex gap-3" @submit.prevent="sendNotification">
+        <UInput
+          v-model="message"
+          size="lg"
+          placeholder="Message..."
+          class="grow"
+        />
+
+        <UButton
+          type="submit"
+          :disabled="isSendNotificationPending"
+          :loading="isSendNotificationPending"
+        >
+          Send Push Notification
         </UButton>
-      </UCard>
+      </form>
+    </UCard>
+  </UContainer>
 
-      <UCard :ui="{ body: { base: 'flex flex-col gap-3' } }">
-        <h2 class="text-xl font-semibold">Send Push Notification</h2>
-
-        <form class="flex gap-3" @submit.prevent="send">
-          <UInput v-model="message" class="grow" />
-          <UButton type="submit">Send Push Notification</UButton>
-        </form>
-      </UCard>
-
-      <UAlert v-if="error" :title="error" color="red" />
-    </UContainer>
-  </ClientOnly>
-
+  <UNotifications />
   <NuxtPwaAssets />
 </template>

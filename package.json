@@ -10,14 +10,16 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
+    "@hebilicious/vue-query-nuxt": "^0.3.0",
     "@nuxt/eslint-config": "^0.2.0",
-    "@nuxt/ui": "latest",
+    "@nuxt/ui": "^2.14.2",
     "@rushstack/eslint-patch": "^1.7.2",
+    "@tanstack/vue-query": "^5.28.4",
     "@types/bun": "^1.0.8",
     "@types/web-push": "^3.6.3",
     "@vite-pwa/nuxt": "^0.6.0",
     "@vue/eslint-config-prettier": "^9.0.0",
-    "@vueuse/nuxt": "latest",
+    "@vueuse/nuxt": "^10.9.0",
     "nuxt": "^3.10.3",
     "typescript": "^5.4.2",
     "valibot": "^0.30.0",
