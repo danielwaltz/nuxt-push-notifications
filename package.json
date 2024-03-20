@@ -26,6 +26,7 @@
     "vue": "^3.4.21",
     "vue-router": "^4.3.0",
     "web-push": "^3.6.7",
+    "webcrypto-liner": "^1.4.3",
     "workbox-build": "^7.0.0",
     "workbox-core": "^7.0.0",
     "workbox-routing": "^7.0.0",
