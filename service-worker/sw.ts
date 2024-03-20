@@ -2,12 +2,7 @@
 /// <reference types="vite/client" />
 
 import { clientsClaim } from 'workbox-core';
-import {
-  cleanupOutdatedCaches,
-  createHandlerBoundToURL,
-  precacheAndRoute,
-} from 'workbox-precaching';
-import { NavigationRoute, registerRoute } from 'workbox-routing';
+import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -15,8 +10,6 @@ self.skipWaiting();
 clientsClaim();
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
-
-registerRoute(new NavigationRoute(createHandlerBoundToURL('/')));
 
 self.addEventListener('push', onPush);
 self.addEventListener('notificationclick', onNotificationClick);

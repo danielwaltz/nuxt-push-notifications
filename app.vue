@@ -35,6 +35,8 @@ const { data: isSubscribed, isFetching: isSubscribedFetching } = useQuery({
 
     const authKey = getAuthKey();
 
+    if (!authKey) return false;
+
     return $fetch(`/api/notifications/subscribed/${authKey}`);
   },
 });
