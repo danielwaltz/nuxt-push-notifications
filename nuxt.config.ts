@@ -9,6 +9,11 @@ export default defineNuxtConfig({
   nitro: {
     storage: {
       db: {
+        driver: 'cloudflare-kv-binding',
+      },
+    },
+    devStorage: {
+      db: {
         driver: 'fsLite',
         base: './.data/db',
       },
