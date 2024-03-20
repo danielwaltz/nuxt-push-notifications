@@ -1,4 +1,3 @@
-import 'webcrypto-liner';
 import webpush, { WebPushError, type PushSubscription } from 'web-push';
 import * as v from 'valibot';
 
@@ -24,6 +23,8 @@ export default defineEventHandler(async (event) => {
   const email = 'mailto:noreply@example.com';
   const publicKey = runtimeConfig.public.push.vapidPublicKey;
   const privateKey = runtimeConfig.push.vapidPrivateKey;
+
+  if (!publicKey || !privateKey) throw new Error('VAPID keys are not set');
 
   webpush.setVapidDetails(email, publicKey, privateKey);
 
