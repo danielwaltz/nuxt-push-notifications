@@ -8,8 +8,6 @@ const BodySchema = v.object({
   }),
 });
 
-export type NotificationsSubscribeBody = v.Input<typeof BodySchema>;
-
 const validate = (data: unknown) => v.parse(BodySchema, data);
 
 export default defineEventHandler(async (event) => {

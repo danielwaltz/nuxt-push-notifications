@@ -1,8 +1,43 @@
 <script setup lang="ts">
+useHead({ title: 'Nuxt Push Notifications' });
+
 const { $pwa } = useNuxtApp();
 const runtimeConfig = useRuntimeConfig();
 const toast = useToast();
+const queryClient = useQueryClient();
 const notificationAccess = usePermission('notifications');
+
+const { data: isSubscribed, isFetching: isSubscribedFetching } = useQuery({
+  queryKey: ['subscribed', notificationAccess],
+  queryFn: async () => {
+    if (!$pwa) return false;
+
+    const isGranted = notificationAccess.value === 'granted';
+
+    if (!isGranted) return false;
+
+    const registration = $pwa.getSWRegistration();
+
+    if (!registration) return false;
+
+    const vapidPublicKey = runtimeConfig.public.push.vapidPublicKey;
+
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+    });
+
+    const getAuthKey = () => {
+      const json = subscription.toJSON();
+      const authKey = json.keys?.['auth'];
+      return typeof authKey === 'string' ? authKey : '';
+    };
+
+    const authKey = getAuthKey();
+
+    return $fetch(`/api/notifications/subscribed/${authKey}`);
+  },
+});
 
 const { isPending: isSubscribePending, mutateAsync: subscribeMutate } =
   useMutation({
@@ -47,9 +82,10 @@ const { isPending: isSubscribePending, mutateAsync: subscribeMutate } =
 
       if (!result.success) throw new Error('Subscription not saved');
 
-      console.log('Subscription saved');
+      return result;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subscribed'] });
       toast.add({ title: 'Subscribed to push notifications', color: 'green' });
     },
     onError: (error) => {
@@ -77,7 +113,7 @@ const {
 
     if (!result.success) throw new Error('Notification not sent');
 
-    console.log('Notification sent');
+    return result;
   },
   onSuccess: () => {
     toast.add({ title: 'Notification sent', color: 'green' });
@@ -105,16 +141,21 @@ const sendNotification = async () => {
 
       <ClientOnly>
         <div>Notifications access: {{ notificationAccess }}</div>
-      </ClientOnly>
 
-      <UButton
-        :disabled="isSubscribePending"
-        :loading="isSubscribePending"
-        class="self-start"
-        @click="subscribeMutate"
-      >
-        Subscribe to Push Notifications
-      </UButton>
+        <div>
+          Subscribed to push notifications:
+          {{ isSubscribedFetching ? 'loading...' : isSubscribed }}
+        </div>
+
+        <UButton
+          :disabled="isSubscribePending || isSubscribedFetching || isSubscribed"
+          :loading="isSubscribePending || isSubscribedFetching"
+          class="self-start"
+          @click="subscribeMutate"
+        >
+          Subscribe to Push Notifications
+        </UButton>
+      </ClientOnly>
     </UCard>
 
     <UCard :ui="{ body: { base: 'flex flex-col gap-3' } }">
@@ -123,6 +164,7 @@ const sendNotification = async () => {
       <form class="flex gap-3" @submit.prevent="sendNotification">
         <UInput
           v-model="message"
+          :disabled="isSendNotificationPending"
           size="lg"
           placeholder="Message..."
           class="grow"

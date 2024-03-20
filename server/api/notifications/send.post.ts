@@ -13,8 +13,6 @@ const BodySchema = v.object({
   tag: v.optional(v.string()),
 });
 
-export type NotificationsSendBody = v.Input<typeof BodySchema>;
-
 const validate = (data: unknown) => v.parse(BodySchema, data);
 
 export default defineEventHandler(async (event) => {
