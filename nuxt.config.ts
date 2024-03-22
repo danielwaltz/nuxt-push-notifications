@@ -22,6 +22,7 @@ export default defineNuxtConfig({
       push: {
         vapidPublicKey: '',
       },
+      siteUrl: 'http://localhost:3000',
     },
   },
   pwa: {

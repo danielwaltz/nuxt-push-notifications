@@ -3,6 +3,7 @@ ARG NODE_VERSION=20.10.0
 # Base
 FROM node:${NODE_VERSION}-slim as base
 WORKDIR /app
+ENV NUXT_PUBLIC_SITE_URL=$RENDER_EXTERNAL_URL
 
 # Install
 FROM base AS install

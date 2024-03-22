@@ -1,17 +1,22 @@
 import webpush, { WebPushError, type PushSubscription } from 'web-push';
 import * as v from 'valibot';
 
-const BodySchema = v.object({
-  title: v.string(),
-  badge: v.optional(v.string()),
-  body: v.optional(v.string()),
-  data: v.optional(v.object({ url: v.optional(v.string()) })),
-  icon: v.optional(v.string()),
-  lang: v.optional(v.string()),
-  requireInteraction: v.optional(v.boolean()),
-  silent: v.optional(v.boolean()),
-  tag: v.optional(v.string()),
+const NotificationOptionsSchema = v.object({
+  badge: v.string(),
+  body: v.string(),
+  data: v.object({ url: v.string() }),
+  dir: v.picklist(['auto', 'ltr', 'rtl']),
+  icon: v.string(),
+  lang: v.string(),
+  requireInteraction: v.boolean(),
+  silent: v.boolean(),
+  tag: v.string(),
 });
+
+const BodySchema = v.merge([
+  v.object({ title: v.string() }),
+  v.partial(NotificationOptionsSchema),
+]);
 
 const validate = (data: unknown) => v.parse(BodySchema, data);
 

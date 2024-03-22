@@ -109,7 +109,7 @@ const {
       method: 'POST',
       body: {
         title: message,
-        data: { url: 'http://localhost:3000' },
+        data: { url: runtimeConfig.public.siteUrl },
       },
     });
 
