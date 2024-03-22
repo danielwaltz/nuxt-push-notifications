@@ -136,7 +136,18 @@ const sendNotification = async () => {
 
 <template>
   <UContainer class="flex flex-col gap-6 p-6">
-    <h1 class="text-2xl font-bold">Nuxt Push Notifications</h1>
+    <div class="flex items-center gap-3">
+      <h1 class="text-2xl font-bold">Nuxt Push Notifications</h1>
+
+      <NuxtLink
+        href="https://github.com/danielwaltz/nuxt-push-notifications"
+        external
+        class="flex text-2xl"
+      >
+        <UIcon name="i-mdi-github" dynamic />
+        <span class="sr-only">View Source on GitHub</span>
+      </NuxtLink>
+    </div>
 
     <UCard :ui="{ body: { base: 'flex flex-col gap-3' } }">
       <h2 class="text-xl font-semibold">Push Notifications</h2>
