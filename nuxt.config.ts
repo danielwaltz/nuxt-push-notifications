@@ -1,11 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  compatibilityDate: '2024-07-04',
   modules: [
     '@hebilicious/vue-query-nuxt',
     '@nuxt/ui',
     '@vite-pwa/nuxt',
     '@vueuse/nuxt',
   ],
+  future: {
+    compatibilityVersion: 4,
+  },
   nitro: {
     storage: {
       db: {
