@@ -1,5 +1,4 @@
 import webpush, { WebPushError, type PushSubscription } from 'web-push';
-import * as v from 'valibot';
 
 const NotificationOptionsSchema = v.object({
   badge: v.string(),

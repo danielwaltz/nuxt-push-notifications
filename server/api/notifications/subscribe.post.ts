@@ -1,5 +1,3 @@
-import * as v from 'valibot';
-
 const BodySchema = v.object({
   endpoint: v.string(),
   keys: v.object({
