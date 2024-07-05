@@ -49,9 +49,9 @@ async function openUrl(url: string) {
   const clients = await self.clients.matchAll({ type: 'window' });
 
   // Chrome 42-48 does not support navigate
-  if (clients.length !== 0 && 'navigate' in clients[0]) {
+  if (clients.length !== 0 && 'navigate' in clients[0]!) {
     const client = getIdealClient(clients);
-    await client.navigate(url).then((client) => client?.focus());
+    await client?.navigate(url).then((client) => client?.focus());
   }
 
   await self.clients.openWindow(url);
