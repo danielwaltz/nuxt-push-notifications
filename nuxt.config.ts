@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-07-04',
   modules: [
     '@hebilicious/vue-query-nuxt',
+    '@nuxt/eslint',
     '@nuxt/ui',
     '@vite-pwa/nuxt',
     '@vueuse/nuxt',
