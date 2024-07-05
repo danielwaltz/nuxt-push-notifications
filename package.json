@@ -7,7 +7,9 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "lint": "eslint . --max-warnings 0",
+    "type-check": "nuxt typecheck"
   },
   "devDependencies": {
     "@hebilicious/vue-query-nuxt": "^0.3.0",
@@ -25,6 +27,7 @@
     "valibot": "^0.36.0",
     "vue": "^3.4.31",
     "vue-router": "^4.4.0",
+    "vue-tsc": "^2.0.26",
     "web-push": "^3.6.7",
     "workbox-build": "^7.1.1",
     "workbox-core": "^7.1.0",
