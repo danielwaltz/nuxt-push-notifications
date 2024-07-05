@@ -6,10 +6,8 @@ const BodySchema = v.object({
   }),
 });
 
-const validate = (data: unknown) => v.parse(BodySchema, data);
-
 export default defineEventHandler(async (event) => {
-  const body = await readValidatedBody(event, validate);
+  const body = await readValidatedBody(event, validate(BodySchema));
 
   const storage = useStorage('db');
 

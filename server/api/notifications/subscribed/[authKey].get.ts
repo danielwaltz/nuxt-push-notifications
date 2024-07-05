@@ -2,10 +2,8 @@ const ParamsSchema = v.object({
   authKey: v.string(),
 });
 
-const validate = (data: unknown) => v.parse(ParamsSchema, data);
-
 export default defineEventHandler(async (event) => {
-  const params = await getValidatedRouterParams(event, validate);
+  const params = await getValidatedRouterParams(event, validate(ParamsSchema));
 
   const storage = useStorage('db');
 

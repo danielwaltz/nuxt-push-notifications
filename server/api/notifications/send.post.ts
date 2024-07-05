@@ -12,15 +12,13 @@ const NotificationOptionsSchema = v.object({
   tag: v.string(),
 });
 
-const BodySchema = v.merge([
-  v.object({ title: v.string() }),
-  v.partial(NotificationOptionsSchema),
-]);
-
-const validate = (data: unknown) => v.parse(BodySchema, data);
+const BodySchema = v.object({
+  ...v.object({ title: v.string() }).entries,
+  ...v.partial(NotificationOptionsSchema).entries,
+});
 
 export default defineEventHandler(async (event) => {
-  const body = await readValidatedBody(event, validate);
+  const body = await readValidatedBody(event, validate(BodySchema));
 
   const runtimeConfig = useRuntimeConfig();
 
