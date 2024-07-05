@@ -7,7 +7,7 @@ WORKDIR /app
 # Install
 FROM base AS install
 COPY package.json package-lock.json ./
-RUN npm ci --prefer-offline
+RUN npm ci --prefer-offline --no-audit
 
 # Development
 FROM install AS development
