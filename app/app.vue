@@ -1,18 +1,18 @@
 <script setup lang="ts">
-useHead({ title: 'Nuxt Push Notifications' });
+useHead({ title: "Nuxt Push Notifications" });
 
 const { $pwa } = useNuxtApp();
 const runtimeConfig = useRuntimeConfig();
 const toast = useToast();
 const queryClient = useQueryClient();
-const notificationAccess = usePermission('notifications');
+const notificationAccess = usePermission("notifications");
 
 const { data: isSubscribed, isFetching: isSubscribedFetching } = useQuery({
-  queryKey: ['subscribed', notificationAccess],
+  queryKey: ["subscribed", notificationAccess],
   queryFn: async () => {
     if (!$pwa) return false;
 
-    const isGranted = notificationAccess.value === 'granted';
+    const isGranted = notificationAccess.value === "granted";
 
     if (!isGranted) return false;
 
@@ -29,8 +29,8 @@ const { data: isSubscribed, isFetching: isSubscribedFetching } = useQuery({
 
     const getAuthKey = () => {
       const json = subscription.toJSON();
-      const authKey = json.keys?.['auth'];
-      return typeof authKey === 'string' ? authKey : '';
+      const authKey = json.keys?.auth;
+      return typeof authKey === "string" ? authKey : "";
     };
 
     const authKey = getAuthKey();
@@ -43,31 +43,31 @@ const { data: isSubscribed, isFetching: isSubscribedFetching } = useQuery({
 
 const { isPending: isSubscribePending, mutateAsync: subscribeMutate } =
   useMutation({
-    mutationKey: ['subscribe'],
+    mutationKey: ["subscribe"],
     mutationFn: async () => {
       if (!$pwa) {
-        throw new Error('PWA module is not available');
+        throw new Error("PWA module is not available");
       }
 
-      const isServiceWorkerAvailable = 'serviceWorker' in navigator;
-      const isPushManagerAvailable = 'PushManager' in window;
+      const isServiceWorkerAvailable = "serviceWorker" in navigator;
+      const isPushManagerAvailable = "PushManager" in window;
 
       if (!isServiceWorkerAvailable || !isPushManagerAvailable) {
-        throw new Error('Service Worker or Push Manager is not available');
+        throw new Error("Service Worker or Push Manager is not available");
       }
 
       const permission = await Notification.requestPermission();
 
-      const isGranted = permission === 'granted';
+      const isGranted = permission === "granted";
 
       if (!isGranted) {
-        throw new Error('Permission not granted');
+        throw new Error("Permission not granted");
       }
 
       const registration = $pwa.getSWRegistration();
 
       if (!registration) {
-        throw new Error('Service Worker registration is not available');
+        throw new Error("Service Worker registration is not available");
       }
 
       const vapidPublicKey = runtimeConfig.public.push.vapidPublicKey;
@@ -77,21 +77,21 @@ const { isPending: isSubscribePending, mutateAsync: subscribeMutate } =
         applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
       });
 
-      const result = await $fetch('/api/notifications/subscribe', {
-        method: 'POST',
+      const result = await $fetch("/api/notifications/subscribe", {
+        method: "POST",
         body: subscription,
       });
 
-      if (!result.success) throw new Error('Subscription not saved');
+      if (!result.success) throw new Error("Subscription not saved");
 
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['subscribed'] });
-      toast.add({ title: 'Subscribed to push notifications', color: 'green' });
+      queryClient.invalidateQueries({ queryKey: ["subscribed"] });
+      toast.add({ title: "Subscribed to push notifications", color: "green" });
     },
     onError: (error) => {
-      toast.add({ title: error.message, color: 'red' });
+      toast.add({ title: error.message, color: "red" });
     },
   });
 
@@ -99,38 +99,38 @@ const {
   isPending: isSendNotificationPending,
   mutateAsync: sendNotificationMutate,
 } = useMutation({
-  mutationKey: ['sendNotification'],
+  mutationKey: ["sendNotification"],
   mutationFn: async (message: string) => {
     if (!message) {
-      throw new Error('Message is required');
+      throw new Error("Message is required");
     }
 
-    const result = await $fetch('/api/notifications/send', {
-      method: 'POST',
+    const result = await $fetch("/api/notifications/send", {
+      method: "POST",
       body: {
         title: message,
         data: { url: runtimeConfig.public.siteUrl },
       },
     });
 
-    if (!result.success) throw new Error('Notification not sent');
+    if (!result.success) throw new Error("Notification not sent");
 
     return result;
   },
   onSuccess: () => {
-    toast.add({ title: 'Notification sent', color: 'green' });
+    toast.add({ title: "Notification sent", color: "green" });
   },
   onError: (error) => {
-    toast.add({ title: error.message, color: 'red' });
+    toast.add({ title: error.message, color: "red" });
   },
 });
 
-const message = ref('');
+const message = ref("");
 
 const sendNotification = async () => {
   await sendNotificationMutate(message.value);
 
-  message.value = '';
+  message.value = "";
 };
 </script>
 
@@ -157,7 +157,7 @@ const sendNotification = async () => {
 
         <div>
           Subscribed to push notifications:
-          {{ isSubscribedFetching ? 'loading...' : isSubscribed }}
+          {{ isSubscribedFetching ? "loading..." : isSubscribed }}
         </div>
 
         <UButton

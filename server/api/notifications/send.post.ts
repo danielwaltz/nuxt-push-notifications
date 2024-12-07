@@ -1,10 +1,10 @@
-import webpush, { WebPushError, type PushSubscription } from 'web-push';
+import webpush, { WebPushError, type PushSubscription } from "web-push";
 
 const NotificationOptionsSchema = v.object({
   badge: v.string(),
   body: v.string(),
   data: v.object({ url: v.string() }),
-  dir: v.picklist(['auto', 'ltr', 'rtl']),
+  dir: v.picklist(["auto", "ltr", "rtl"]),
   icon: v.string(),
   lang: v.string(),
   requireInteraction: v.boolean(),
@@ -22,17 +22,17 @@ export default defineEventHandler(async (event) => {
 
   const runtimeConfig = useRuntimeConfig();
 
-  const email = 'mailto:noreply@example.com';
+  const email = "mailto:noreply@example.com";
   const publicKey = runtimeConfig.public.push.vapidPublicKey;
   const privateKey = runtimeConfig.push.vapidPrivateKey;
 
-  if (!publicKey || !privateKey) throw new Error('VAPID keys are not set');
+  if (!publicKey || !privateKey) throw new Error("VAPID keys are not set");
 
   webpush.setVapidDetails(email, publicKey, privateKey);
 
-  const storage = useStorage('db');
+  const storage = useStorage("db");
 
-  const keys = await storage.getKeys('subscription');
+  const keys = await storage.getKeys("subscription");
 
   for (const key of keys) {
     const subscription = await storage.getItem<PushSubscription>(key);

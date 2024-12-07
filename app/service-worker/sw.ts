@@ -1,8 +1,9 @@
+/* eslint-disable no-console */
 /// <reference lib='WebWorker' />
 /// <reference types="vite/client" />
 
-import { clientsClaim } from 'workbox-core';
-import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
+import { clientsClaim } from "workbox-core";
+import { cleanupOutdatedCaches, precacheAndRoute } from "workbox-precaching";
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -11,11 +12,11 @@ clientsClaim();
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 
-self.addEventListener('push', onPush);
-self.addEventListener('notificationclick', onNotificationClick);
+self.addEventListener("push", onPush);
+self.addEventListener("notificationclick", onNotificationClick);
 
 function onPush(event: PushEvent) {
-  console.log('[Service Worker] push received');
+  console.log("[Service Worker] push received");
 
   if (!event.data) return;
 
@@ -25,7 +26,7 @@ function onPush(event: PushEvent) {
 }
 
 function onNotificationClick(event: NotificationEvent) {
-  console.log('[Service Worker] notification clicked');
+  console.log("[Service Worker] notification clicked");
 
   const handleNotificationClick = new Promise((resolve) => {
     event.notification.close();
@@ -41,15 +42,15 @@ function onNotificationClick(event: NotificationEvent) {
 
 function getIdealClient(clients: Readonly<WindowClient[]>) {
   const focusedClient = clients.find((c) => c.focused);
-  const visibleClient = clients.find((c) => c.visibilityState === 'visible');
+  const visibleClient = clients.find((c) => c.visibilityState === "visible");
   return focusedClient || visibleClient || clients[0];
 }
 
 async function openUrl(url: string) {
-  const clients = await self.clients.matchAll({ type: 'window' });
+  const clients = await self.clients.matchAll({ type: "window" });
 
   // Chrome 42-48 does not support navigate
-  if (clients.length !== 0 && 'navigate' in clients[0]!) {
+  if (clients.length !== 0 && "navigate" in clients[0]!) {
     const client = getIdealClient(clients);
     await client?.navigate(url).then((client) => client?.focus());
   }

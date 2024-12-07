@@ -1,12 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-07-04',
+  compatibilityDate: "2024-07-04",
   modules: [
-    '@hebilicious/vue-query-nuxt',
-    '@nuxt/eslint',
-    '@nuxt/ui',
-    '@vite-pwa/nuxt',
-    '@vueuse/nuxt',
+    "@hebilicious/vue-query-nuxt",
+    "@nuxt/eslint",
+    "@nuxt/ui",
+    "@vite-pwa/nuxt",
+    "@vueuse/nuxt",
   ],
   future: {
     compatibilityVersion: 4,
@@ -14,33 +14,38 @@ export default defineNuxtConfig({
   nitro: {
     storage: {
       db: {
-        driver: 'fsLite',
-        base: './.data/db',
+        driver: "fsLite",
+        base: "./.data/db",
       },
     },
   },
   runtimeConfig: {
     push: {
-      vapidPrivateKey: '',
+      vapidPrivateKey: "",
     },
     public: {
       push: {
-        vapidPublicKey: '',
+        vapidPublicKey: "",
       },
-      siteUrl: 'http://localhost:3000',
+      siteUrl: "http://localhost:3000",
+    },
+  },
+  eslint: {
+    config: {
+      standalone: false,
     },
   },
   pwa: {
-    strategies: 'injectManifest',
-    srcDir: './service-worker',
-    filename: 'sw.ts',
-    registerType: 'autoUpdate',
+    strategies: "injectManifest",
+    srcDir: "./service-worker",
+    filename: "sw.ts",
+    registerType: "autoUpdate",
     manifest: {
-      theme_color: '#000000',
+      theme_color: "#000000",
     },
     devOptions: {
       enabled: true,
-      type: 'module',
+      type: "module",
     },
   },
 });

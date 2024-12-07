@@ -5,7 +5,7 @@ const ParamsSchema = v.object({
 export default defineEventHandler(async (event) => {
   const params = await getValidatedRouterParams(event, validate(ParamsSchema));
 
-  const storage = useStorage('db');
+  const storage = useStorage("db");
 
   return storage.hasItem(`subscription:${params.authKey}`);
 });

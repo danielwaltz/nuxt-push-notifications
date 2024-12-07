@@ -9,7 +9,7 @@ const BodySchema = v.object({
 export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, validate(BodySchema));
 
-  const storage = useStorage('db');
+  const storage = useStorage("db");
 
   await storage.setItem(`subscription:${body.keys.auth}`, body);
 
