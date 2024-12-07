@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: "2024-07-04",
+  compatibilityDate: "2024-11-04",
   modules: [
     "@hebilicious/vue-query-nuxt",
     "@nuxt/eslint",
@@ -33,6 +33,9 @@ export default defineNuxtConfig({
   eslint: {
     config: {
       standalone: false,
+      nuxt: {
+        sortConfigKeys: true,
+      },
     },
   },
   pwa: {
