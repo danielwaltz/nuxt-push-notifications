@@ -1,6 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: "2024-11-04",
   modules: [
     "@hebilicious/vue-query-nuxt",
     "@nuxt/eslint",
@@ -8,17 +7,6 @@ export default defineNuxtConfig({
     "@vite-pwa/nuxt",
     "@vueuse/nuxt",
   ],
-  future: {
-    compatibilityVersion: 4,
-  },
-  nitro: {
-    storage: {
-      db: {
-        driver: "fsLite",
-        base: "./.data/db",
-      },
-    },
-  },
   runtimeConfig: {
     push: {
       vapidPrivateKey: "",
@@ -28,6 +16,18 @@ export default defineNuxtConfig({
         vapidPublicKey: "",
       },
       siteUrl: "http://localhost:3000",
+    },
+  },
+  future: {
+    compatibilityVersion: 4,
+  },
+  compatibilityDate: "2024-11-04",
+  nitro: {
+    storage: {
+      db: {
+        driver: "fsLite",
+        base: "./.data/db",
+      },
     },
   },
   eslint: {
