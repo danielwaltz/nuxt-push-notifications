@@ -1,30 +1,31 @@
 ARG NODE_VERSION=22.11.0
 
 # Base
-FROM node:${NODE_VERSION}-slim as base
+FROM node:${NODE_VERSION}-slim AS base
 WORKDIR /app
 
-# Install
-FROM base AS install
-COPY package.json package-lock.json ./
-RUN npm ci --prefer-offline --no-audit
-
 # Development
-FROM install AS development
-ENV NODE_ENV=development
-COPY . .
-EXPOSE 3000
-CMD ["npm", "run", "dev"]
+FROM base AS development
+STOPSIGNAL SIGKILL
+CMD ["sh", "-c", "npm i && npm run dev"]
 
-# Build
-FROM install AS build
-ENV NODE_ENV=production
+# Dependencies
+FROM base AS dependencies
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Builder
+FROM dependencies AS builder
 COPY . .
 RUN npm run build
 
 # Production
 FROM base AS production
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+RUN groupadd -r -g 1001 app && useradd -r -u 1001 -g app app
+USER app
+COPY --chown=app:app --from=builder /app/.output ./.output
 ENV NODE_ENV=production
-COPY --from=build /app/.output ./.output
 EXPOSE 3000
+HEALTHCHECK CMD ["curl", "-f", "http://localhost:3000/health"]
 CMD ["node", ".output/server/index.mjs"]
