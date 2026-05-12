@@ -27,8 +27,7 @@ export default defineNuxtConfig({
   nitro: {
     storage: {
       db: {
-        driver: "fsLite",
-        base: "./.data/db",
+        driver: "memory",
       },
     },
   },
