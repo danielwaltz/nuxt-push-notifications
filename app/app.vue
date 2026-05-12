@@ -148,71 +148,72 @@ const sendNotification = async () => {
 </script>
 
 <template>
-  <UContainer class="flex flex-col gap-6 p-6">
-    <div class="flex items-center gap-3">
-      <h1 class="text-2xl font-bold">Nuxt Push Notifications</h1>
+  <UApp>
+    <UContainer class="flex flex-col gap-6 p-6">
+      <div class="flex items-center gap-3">
+        <h1 class="text-2xl font-bold">Nuxt Push Notifications</h1>
 
-      <NuxtLink
-        href="https://github.com/danielwaltz/nuxt-push-notifications"
-        external
-        class="flex text-2xl"
-      >
-        <UIcon name="i-simple-icons-github" dynamic />
-        <span class="sr-only">View Source on GitHub</span>
-      </NuxtLink>
-    </div>
-
-    <UCard :ui="{ body: 'flex flex-col gap-3' }">
-      <h2 class="text-xl font-semibold">Push Notifications</h2>
-
-      <ClientOnly>
-        <div>Notifications access: {{ notificationAccess }}</div>
-
-        <div>
-          Subscribed to push notifications:
-          {{ subscribedStatus === "loading" ? "loading..." : isSubscribed }}
-        </div>
-
-        <UButton
-          :disabled="
-            subscribeStatus === 'loading' ||
-            subscribedStatus === 'loading' ||
-            isSubscribed
-          "
-          :loading="
-            subscribeStatus === 'loading' || subscribedStatus === 'loading'
-          "
-          class="self-start"
-          @click="subscribe"
+        <NuxtLink
+          href="https://github.com/danielwaltz/nuxt-push-notifications"
+          external
+          class="flex text-2xl"
         >
-          Subscribe to Push Notifications
-        </UButton>
-      </ClientOnly>
-    </UCard>
+          <UIcon name="i-simple-icons-github" dynamic />
+          <span class="sr-only">View Source on GitHub</span>
+        </NuxtLink>
+      </div>
 
-    <UCard :ui="{ body: 'flex flex-col gap-3' }">
-      <h2 class="text-xl font-semibold">Send Push Notification</h2>
+      <UCard :ui="{ body: 'flex flex-col gap-3' }">
+        <h2 class="text-xl font-semibold">Push Notifications</h2>
 
-      <form class="flex gap-3" @submit.prevent="sendNotification">
-        <UInput
-          v-model="message"
-          :disabled="sendNotificationStatus === 'loading'"
-          size="lg"
-          placeholder="Message..."
-          class="grow"
-        />
+        <ClientOnly>
+          <div>Notifications access: {{ notificationAccess }}</div>
 
-        <UButton
-          type="submit"
-          :disabled="sendNotificationStatus === 'loading'"
-          :loading="sendNotificationStatus === 'loading'"
-        >
-          Send Push Notification
-        </UButton>
-      </form>
-    </UCard>
-  </UContainer>
+          <div>
+            Subscribed to push notifications:
+            {{ subscribedStatus === "loading" ? "loading..." : isSubscribed }}
+          </div>
 
-  <UNotifications />
-  <NuxtPwaAssets />
+          <UButton
+            :disabled="
+              subscribeStatus === 'loading' ||
+              subscribedStatus === 'loading' ||
+              isSubscribed
+            "
+            :loading="
+              subscribeStatus === 'loading' || subscribedStatus === 'loading'
+            "
+            class="self-start"
+            @click="subscribe"
+          >
+            Subscribe to Push Notifications
+          </UButton>
+        </ClientOnly>
+      </UCard>
+
+      <UCard :ui="{ body: 'flex flex-col gap-3' }">
+        <h2 class="text-xl font-semibold">Send Push Notification</h2>
+
+        <form class="flex gap-3" @submit.prevent="sendNotification">
+          <UInput
+            v-model="message"
+            :disabled="sendNotificationStatus === 'loading'"
+            size="lg"
+            placeholder="Message..."
+            class="grow"
+          />
+
+          <UButton
+            type="submit"
+            :disabled="sendNotificationStatus === 'loading'"
+            :loading="sendNotificationStatus === 'loading'"
+          >
+            Send Push Notification
+          </UButton>
+        </form>
+      </UCard>
+    </UContainer>
+
+    <NuxtPwaAssets />
+  </UApp>
 </template>
