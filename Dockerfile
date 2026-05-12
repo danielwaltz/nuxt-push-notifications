@@ -1,28 +1,40 @@
-ARG NODE_VERSION=22.11.0
+ARG NODE_VERSION=24.13.0
 
 # Base
 FROM node:${NODE_VERSION}-slim AS base
 WORKDIR /app
 
+# Tooling
+FROM base AS tooling
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN npm i -g corepack@latest && corepack enable
+
 # Development
-FROM base AS development
-STOPSIGNAL SIGKILL
-CMD ["sh", "-c", "npm i && npm run dev"]
+FROM tooling AS development
+CMD ["bash", "-c", "pnpm i && pnpm dev"]
 
 # Dependencies
-FROM base AS dependencies
-COPY package.json package-lock.json ./
-RUN npm ci
+FROM tooling AS dependencies
+COPY package.json pnpm-*.yaml ./
+RUN pnpm ci
 
 # Builder
 FROM dependencies AS builder
 COPY . .
-RUN npm run build
+RUN pnpm postinstall && pnpm build
 
 # Production
 FROM base AS production
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /app/.output ./.output
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd -r -g 1001 app && \
+    useradd -r -u 1001 -g app app
+USER app
+COPY --chown=app:app --from=builder /app/.output ./.output
 ENV NODE_ENV=production
 EXPOSE 3000
 HEALTHCHECK CMD ["curl", "-f", "http://localhost:3000/health"]

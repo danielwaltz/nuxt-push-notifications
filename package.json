@@ -1,6 +1,7 @@
 {
   "name": "nuxt-push-notifications",
   "private": true,
+  "packageManager": "pnpm@11.1.1",
   "type": "module",
   "scripts": {
     "build": "nuxt build",
@@ -8,7 +9,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "lint": "eslint --cache --cache-location ./node_modules/.cache/.eslintcache --max-warnings 0",
+    "lint": "eslint",
     "type-check": "nuxt typecheck"
   },
   "devDependencies": {
