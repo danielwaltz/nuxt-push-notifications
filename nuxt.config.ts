@@ -1,12 +1,14 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
-    "@hebilicious/vue-query-nuxt",
     "@nuxt/eslint",
     "@nuxt/ui",
+    "@pinia/colada-nuxt",
+    "@pinia/nuxt",
     "@vite-pwa/nuxt",
     "@vueuse/nuxt",
   ],
+  css: ["~/assets/css/main.css"],
   runtimeConfig: {
     push: {
       vapidPrivateKey: "",
@@ -18,10 +20,10 @@ export default defineNuxtConfig({
       siteUrl: "http://localhost:3000",
     },
   },
-  future: {
-    compatibilityVersion: 4,
+  experimental: {
+    typescriptPlugin: true,
   },
-  compatibilityDate: "2025-01-01",
+  compatibilityDate: "2026-05-12",
   nitro: {
     storage: {
       db: {

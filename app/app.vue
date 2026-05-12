@@ -1,15 +1,15 @@
 <script setup lang="ts">
-useHead({ title: "Nuxt Push Notifications" });
+useSeoMeta({ title: "Nuxt Push Notifications" });
 
 const { $pwa } = useNuxtApp();
 const runtimeConfig = useRuntimeConfig();
 const toast = useToast();
-const queryClient = useQueryClient();
+const queryCache = useQueryCache();
 const notificationAccess = usePermission("notifications");
 
-const { data: isSubscribed, isFetching: isSubscribedFetching } = useQuery({
-  queryKey: ["subscribed", notificationAccess],
-  queryFn: async () => {
+const { data: isSubscribed, asyncStatus: subscribedStatus } = useQuery({
+  key: ["subscribed", notificationAccess],
+  query: async () => {
     if (!$pwa) return false;
 
     const isGranted = notificationAccess.value === "granted";
@@ -41,21 +41,22 @@ const { data: isSubscribed, isFetching: isSubscribedFetching } = useQuery({
   },
 });
 
-const { isPending: isSubscribePending, mutateAsync: subscribeMutate } =
+const { mutateAsync: subscribeMutate, asyncStatus: subscribeStatus } =
   useMutation({
-    mutationKey: ["subscribe"],
-    mutationFn: async () => {
+    key: ["subscribe"],
+    mutation: async () => {
       if (!$pwa) {
         throw new Error("PWA module is not available");
       }
 
       const isServiceWorkerAvailable = "serviceWorker" in navigator;
-      const isPushManagerAvailable = "PushManager" in window;
+      const isPushManagerAvailable = "PushManager" in globalThis;
 
       if (!isServiceWorkerAvailable || !isPushManagerAvailable) {
         throw new Error("Service Worker or Push Manager is not available");
       }
 
+      // eslint-disable-next-line baseline-js/use-baseline
       const permission = await Notification.requestPermission();
 
       const isGranted = permission === "granted";
@@ -87,20 +88,23 @@ const { isPending: isSubscribePending, mutateAsync: subscribeMutate } =
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["subscribed"] });
-      toast.add({ title: "Subscribed to push notifications", color: "green" });
+      queryCache.invalidateQueries({ key: ["subscribed"] });
+      toast.add({
+        title: "Subscribed to push notifications",
+        color: "success",
+      });
     },
     onError: (error) => {
-      toast.add({ title: error.message, color: "red" });
+      toast.add({ title: error.message, color: "error" });
     },
   });
 
 const {
-  isPending: isSendNotificationPending,
   mutateAsync: sendNotificationMutate,
+  asyncStatus: sendNotificationStatus,
 } = useMutation({
-  mutationKey: ["sendNotification"],
-  mutationFn: async (message: string) => {
+  key: ["sendNotification"],
+  mutation: async (message: string) => {
     if (!message) {
       throw new Error("Message is required");
     }
@@ -118,16 +122,25 @@ const {
     return result;
   },
   onSuccess: () => {
-    toast.add({ title: "Notification sent", color: "green" });
+    toast.add({ title: "Notification sent", color: "success" });
   },
   onError: (error) => {
-    toast.add({ title: error.message, color: "red" });
+    toast.add({ title: error.message, color: "error" });
   },
 });
+
+const subscribe = async () => {
+  await subscribeMutate();
+};
 
 const message = ref("");
 
 const sendNotification = async () => {
+  if (!message.value) {
+    toast.add({ title: "Message is required", color: "error" });
+    return;
+  }
+
   await sendNotificationMutate(message.value);
 
   message.value = "";
@@ -144,12 +157,12 @@ const sendNotification = async () => {
         external
         class="flex text-2xl"
       >
-        <UIcon name="i-mdi-github" dynamic />
+        <UIcon name="i-simple-icons-github" dynamic />
         <span class="sr-only">View Source on GitHub</span>
       </NuxtLink>
     </div>
 
-    <UCard :ui="{ body: { base: 'flex flex-col gap-3' } }">
+    <UCard :ui="{ body: 'flex flex-col gap-3' }">
       <h2 class="text-xl font-semibold">Push Notifications</h2>
 
       <ClientOnly>
@@ -157,27 +170,33 @@ const sendNotification = async () => {
 
         <div>
           Subscribed to push notifications:
-          {{ isSubscribedFetching ? "loading..." : isSubscribed }}
+          {{ subscribedStatus === "loading" ? "loading..." : isSubscribed }}
         </div>
 
         <UButton
-          :disabled="isSubscribePending || isSubscribedFetching || isSubscribed"
-          :loading="isSubscribePending || isSubscribedFetching"
+          :disabled="
+            subscribeStatus === 'loading' ||
+            subscribedStatus === 'loading' ||
+            isSubscribed
+          "
+          :loading="
+            subscribeStatus === 'loading' || subscribedStatus === 'loading'
+          "
           class="self-start"
-          @click="subscribeMutate"
+          @click="subscribe"
         >
           Subscribe to Push Notifications
         </UButton>
       </ClientOnly>
     </UCard>
 
-    <UCard :ui="{ body: { base: 'flex flex-col gap-3' } }">
+    <UCard :ui="{ body: 'flex flex-col gap-3' }">
       <h2 class="text-xl font-semibold">Send Push Notification</h2>
 
       <form class="flex gap-3" @submit.prevent="sendNotification">
         <UInput
           v-model="message"
-          :disabled="isSendNotificationPending"
+          :disabled="sendNotificationStatus === 'loading'"
           size="lg"
           placeholder="Message..."
           class="grow"
@@ -185,8 +204,8 @@ const sendNotification = async () => {
 
         <UButton
           type="submit"
-          :disabled="isSendNotificationPending"
-          :loading="isSendNotificationPending"
+          :disabled="sendNotificationStatus === 'loading'"
+          :loading="sendNotificationStatus === 'loading'"
         >
           Send Push Notification
         </UButton>
