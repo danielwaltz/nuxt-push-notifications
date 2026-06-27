@@ -2,7 +2,6 @@
   "name": "nuxt-push-notifications",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@11.1.1",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
@@ -42,5 +41,15 @@
     "workbox-precaching": "^7.4.1",
     "workbox-routing": "^7.4.1",
     "workbox-strategies": "^7.4.1"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.9.0"
+    },
+    "runtime": {
+      "name": "node",
+      "version": "24.18.0"
+    }
   }
 }
