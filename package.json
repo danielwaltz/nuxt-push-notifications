@@ -12,8 +12,8 @@
     "lint:fix": "eslint --fix",
     "postinstall": "nuxt prepare",
     "preview": "nuxt preview",
-    "test": "pnpm fmt:check && pnpm lint && pnpm type-check",
-    "type-check": "nuxt typecheck"
+    "test": "pnpm fmt:check && pnpm lint && pnpm typecheck",
+    "typecheck": "nuxt typecheck"
   },
   "devDependencies": {
     "@danielwaltz/eslint-config": "^3.6.1",
