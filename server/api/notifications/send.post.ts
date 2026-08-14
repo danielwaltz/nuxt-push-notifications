@@ -22,11 +22,12 @@ export default defineEventHandler(async (event) => {
 
   const runtimeConfig = useRuntimeConfig();
 
-  const email = "mailto:noreply@example.com";
   const publicKey = runtimeConfig.public.push.vapidPublicKey;
   const privateKey = runtimeConfig.push.vapidPrivateKey;
 
   if (!publicKey || !privateKey) throw new Error("VAPID keys are not set");
+
+  const email = "mailto:noreply@example.com";
 
   webpush.setVapidDetails(email, publicKey, privateKey);
 

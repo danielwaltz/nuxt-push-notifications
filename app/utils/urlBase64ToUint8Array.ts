@@ -9,7 +9,7 @@ export function urlBase64ToUint8Array(base64String: string) {
     .replaceAll("-", "+")
     .replaceAll("_", "/");
 
-  const rawData = globalThis.atob(base64);
+  const rawData = atob(base64);
   const outputArray = new Uint8Array(rawData.length);
 
   for (let i = 0; i < rawData.length; ++i) {
