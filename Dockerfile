@@ -1,4 +1,4 @@
-ARG NODE_VERSION=24.18.0
+ARG NODE_VERSION=26.8.1
 
 # Base
 FROM node:${NODE_VERSION}-slim AS base
@@ -6,10 +6,7 @@ WORKDIR /app
 
 # Tooling
 FROM base AS tooling
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN npm i -g corepack@latest && corepack enable
+RUN npx jup self-install && jup enable
 
 # Development
 FROM tooling AS development
@@ -18,24 +15,20 @@ CMD ["bash", "-c", "pnpm i && pnpm dev"]
 # Dependencies
 FROM tooling AS dependencies
 COPY package.json pnpm-*.yaml ./
-RUN pnpm ci
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm i --frozen-lockfile
 
 # Builder
 FROM dependencies AS builder
 COPY . .
-RUN pnpm postinstall && pnpm build
+RUN pnpm build
 
 # Production
 FROM base AS production
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    groupadd -r -g 1001 app && \
-    useradd -r -u 1001 -g app app
+RUN groupadd -r -g 1001 app && \
+    useradd -r -l -u 1001 -g app app
 USER app
 COPY --chown=app:app --from=builder /app/.output ./.output
 ENV NODE_ENV=production
 EXPOSE 3000
-HEALTHCHECK CMD ["curl", "-f", "http://localhost:3000/health"]
+HEALTHCHECK CMD ["node", "-e", "fetch('http://localhost:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
 CMD ["node", ".output/server/index.mjs"]
